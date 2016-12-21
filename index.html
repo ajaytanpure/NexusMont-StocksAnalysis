@@ -1,0 +1,241 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <script type="text/javascript" src="canvasjs.min.js"></script>
+  <script language="javascript" type="text/javascript">
+  function plot_avg(parameter1) {
+		//alert(parameter1)
+		var plot_point = parameter1.split("|")
+		len = plot_point.length
+		var short_term = []
+		var mid_term = []
+		var long_term = []
+		var close_price = []
+		var date_store = []
+		for(var count = 0; count < len-1; count++){
+		    if(count < 26){
+		        continue;
+		    }
+			values = plot_point[count].split(",")
+			close_price.push({
+				x: count - 25,
+				y: parseFloat(values[1])
+			});
+			short_term.push({
+				x: count - 25,
+				y: parseFloat(values[2])
+			});
+			mid_term.push({
+				x: count - 25,
+				y: parseFloat(values[3])
+			});
+			long_term.push({
+				x: count - 25,
+				y: parseFloat(values[4])
+			});
+			date_store.push({
+			day_no : count - 25,
+			my_date : new Date(values[0])
+			});
+		};
+      var chart = new CanvasJS.Chart("chartContainer", {
+      title:{
+      text: "Moving Averages",
+      fontColor: "RoyalBlue ",
+      fontSize : 20,
+      fontFamily: "sans-serif",
+      fontWeight: "lighter"
+      },
+      toolTip: {
+        shared: true,
+        fontSize: 12,
+        contentFormatter: function(e){
+          var str = "";
+          x_cord = "";
+          for (var i = 0; i < e.entries.length; i++){
+			if(i == 0){
+				var day_number = e.entries[i].dataPoint.x;
+				for(var j = 0; j< date_store.length; j++){
+				    if(day_number == date_store[j].day_no ){
+				        x_cord = date_store[j].my_date.toString();
+				        break;
+				    }
+				}
+				var splitter = x_cord.split("00:00");
+				date = splitter[0]
+				str = str.concat(date + "<br/>")
+			}
+            var  temp = e.entries[i].dataSeries.name + " <strong>"+  e.entries[i].dataPoint.y + "</strong> <br/>" ;
+			str = str.concat(temp);
+          }
+          return (str);
+        }
+      },
+	  zoomEnabled: true,
+	  axisX:{
+        tickColor: "light gray",
+        tickLength: 5,
+        intervalType: "number",
+        labelFontSize: 15,
+        tickThickness: 1,
+        gridThickness : 0,
+        lineColor: "black",
+      },
+	  axisY: {
+        title: "Indian Rupees",
+        titleFontSize: 18,
+        labelFontSize: 15,
+        includeZero: false,
+        titleFontColor: "ForestGreen",
+        titleFontStyle: "bold",
+        gridThickness : 0,
+        lineColor: "black",
+      },
+      data: [
+      {
+		lineThickness: 1.5,
+		markerType : "circle",
+        markerSize: 0,
+		color:"blue",
+        type: "spline",
+        name: "Close",
+        showInLegend: true,
+		dataPoints: close_price
+      },
+	  {
+	    lineThickness: 1.5,
+	    markerType : "circle",
+        markerSize: 0,
+		color:"DarkGreen",
+        type: "spline",
+        name: "Short Avg",
+        showInLegend: true,
+		dataPoints: short_term
+      },
+	   {
+	    lineThickness: 1.5,
+	    markerType : "circle",
+        markerSize: 0,
+		color:"red",
+        type: "spline",
+        name: "Mid Avg",
+        showInLegend: true,
+		dataPoints: mid_term
+      },
+	   {
+	    lineThickness: 1.5,
+	    markerType : "circle",
+        markerSize: 0,
+		color:"LightSlateGray ",
+        type: "spline",
+        name: "Long Avg",
+        showInLegend: true,
+		dataPoints: long_term
+      }
+      ]
+    });
+	chart.render();
+	}
+function plot_stoch(parameter1) {
+		//alert(parameter1)
+		var plot_point = parameter1.split("|")
+		len = plot_point.length
+		var stoch = []
+		var date_store = []
+		for(var count = 0; count < len-1; count++){
+		    if(count < 26){
+		        continue;
+		    }
+			values = plot_point[count].split(",")
+			stoch.push({
+				x: count - 25,
+				y: parseFloat(values[5])
+			});
+			date_store.push({
+			day_no : count - 25,
+			my_date : new Date(values[0])
+			});
+		};
+      var chart = new CanvasJS.Chart("chartContainer1", {
+      title:{
+      text: "Stochastic",
+      fontColor: "RoyalBlue ",
+      fontSize : 20,
+      fontFamily: "sans-serif",
+      fontWeight: "lighter"
+      },
+      toolTip: {
+        shared: true,
+        fontSize: 12,
+        contentFormatter: function(e){
+          var str = "";
+          x_cord = "";
+          for (var i = 0; i < e.entries.length; i++){
+			if(i == 0){
+				var day_number = e.entries[i].dataPoint.x;
+				for(var j = 0; j< date_store.length; j++){
+				    if(day_number == date_store[j].day_no ){
+				        x_cord = date_store[j].my_date.toString();
+				        break;
+				    }
+				}
+				var splitter = x_cord.split("00:00");
+				date = splitter[0]
+				str = str.concat(date + "<br/>")
+			}
+            var  temp = e.entries[i].dataSeries.name + " <strong>"+  e.entries[i].dataPoint.y + "</strong> <br/>" ;
+			str = str.concat(temp);
+          }
+          return (str);
+        }
+      },
+	  zoomEnabled: true,
+	  axisX:{
+        tickColor: "light gray",
+        tickLength: 5,
+        intervalType: "number",
+        labelFontSize: 15,
+        tickThickness: 1,
+        gridThickness : 0,
+        lineColor: "black",
+      },
+	  axisY: {
+        title: "Stoch",
+        titleFontSize: 18,
+        labelFontSize: 15,
+        includeZero: false,
+        maximum: 100,
+        titleFontColor: "ForestGreen",
+        titleFontStyle: "bold",
+        gridThickness : 0,
+        lineColor: "black"
+      },
+      legend: {
+		fontSize: 15
+	},
+      data: [
+      {
+		lineThickness: 1.5,
+		markerType : "circle",
+        markerSize: 0,
+		color:"blue",
+        type: "spline",
+        name: "Stochastic",
+        showInLegend: true,
+		dataPoints: stoch
+      }
+      ]
+    });
+	chart.render();
+	}
+  </script>
+</head>
+ 
+<body>
+<div>
+  <div id="chartContainer" style="height: 350px; width: 95%;" style="display:block"></div>
+  <hr>
+  <div id="chartContainer1" style="height: 150px; width: 95%;" style="display:block"></div>
+</div>
+  </body>
+</html>
