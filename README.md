@@ -12,3 +12,5 @@ It provides the functionality to
 3. Reindex the database to improve the performance  
 4. Rebuild the index in database to improve the performance.  
 5. Zoom into the interested period in graphs to analyze the graphs more accurately.  
+
+For more information contact : ajaytanpure92@gmail.com
