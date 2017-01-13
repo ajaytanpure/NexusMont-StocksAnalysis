@@ -57,12 +57,15 @@ class DataDB():
                                                      "CLOSE_PRICE DECIMAL(8,2) NOT NULL," \
                                                      "SHRT_SIG TINYINT," \
                                                      "SHRT_AVG DECIMAL(8,2)," \
+                                                     "SHRT_DIFF DECIMAL(8,2)," \
                                                      "SHRT_CHNG DECIMAL(6,2)," \
                                                      "MID_SIG TINYINT," \
                                                      "MID_AVG DECIMAL(8,2)," \
+                                                     "MID_DIFF DECIMAL(8,2)," \
                                                      "MID_CHNG DECIMAL(6,2)," \
                                                      "LONG_SIG TINYINT," \
                                                      "LONG_AVG DECIMAL(8,2)," \
+                                                     "LONG_DIFF DECIMAL(8,2)," \
                                                      "LONG_CHNG DECIMAL(6,2)," \
                                                      "CERTUS TINYINT," \
                                                      "VELOX TINYINT," \
@@ -91,11 +94,10 @@ class DataDB():
                                                      "FOREIGN KEY (LONG_SIG) REFERENCES CUSTOM_SIGNAL(ID)," \
                                                      "FOREIGN KEY (EX_SHRT_SIG) REFERENCES CUSTOM_SIGNAL(ID)," \
                                                      "FOREIGN KEY (EX_LONG_SIG) REFERENCES CUSTOM_SIGNAL(ID))"
-        print query
         self.db_obj.run_query(query, commit=True)
 
     def insert_company_data(self, tab_name, params):
-        query = "INSERT INTO [dbo].[" + tab_name + "] values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+        query = "INSERT INTO [dbo].[" + tab_name + "] values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
         print query
         logging.info("Using query : %s" % query)
         self.db_obj.run_query(query, params, commit=True)
@@ -269,8 +271,8 @@ class DataDB():
 
     def get_company_data(self, company):
         query = "SELECT [REC_DATE],[OPEN_PRICE],[HIGH_PRICE],[LOW_PRICE],[CLOSE_PRICE]," \
-                "[SHRT_SIG],[SHRT_AVG],[SHRT_CHNG]," \
-                "[MID_SIG],[MID_AVG],[MID_CHNG]," \
+                "[SHRT_SIG],[SHRT_AVG],[SHRT_DIFF]," \
+                "[MID_SIG],[MID_AVG],[MID_DIFF]," \
                 "[LONG_SIG],[LONG_AVG],[LONG_CHNG]," \
                 "[CERTUS],[VELOX],[FUTURO]," \
                 "[PIVOT_VALUE],[PIVOT_CHNG]," \
@@ -280,7 +282,8 @@ class DataDB():
                 "[QUANTITY],[TRADERS]," \
                 "[EX_LONG_SIG],[EX_LONG_AVG]," \
                 "[MNTM],[MNTM_CHNG] " \
-                "FROM [NexusMont].[dbo].["+company+"]"
+                "FROM ["+company+"]"
+        print query
         db_curs = self.db_obj.run_query(query)
         company_info = db_curs.fetchall()
         return company_info

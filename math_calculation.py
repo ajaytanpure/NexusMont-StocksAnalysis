@@ -57,22 +57,25 @@ class Mathematics():
         elif EX_SHRT_SIG == 3:
             self.db_obj.add_to_xshort_sell(tab_name)
         #--------------------------------------------------------------------------------------------------------------
-        SHRT_AVG, SHRT_CHNG, SHRT_SIG = self.calculate_short_average(recent_data[:self.short_range], company_details)
-        short_details = [SHRT_SIG, SHRT_AVG, SHRT_CHNG]
+        print recent_data[:self.short_range]
+        print self.short_range
+        SHRT_AVG, SHRT_DIFF, SHRT_CHNG, SHRT_SIG = self.calculate_short_average(recent_data[:self.short_range], company_details)
+        short_details = [SHRT_SIG, SHRT_AVG, SHRT_DIFF, SHRT_CHNG]
+        print short_details
         if SHRT_SIG == 1:
             self.db_obj.add_to_short_buy(tab_name)
         elif SHRT_SIG == 3:
             self.db_obj.add_to_short_sell(tab_name)
         #--------------------------------------------------------------------------------------------------------------
-        MID_AVG, MID_CHNG, MID_SIG = self.calculate_mid_average(recent_data[:self.mid_range], company_details)
-        mid_details = [MID_SIG, MID_AVG, MID_CHNG]
+        MID_AVG, MID_DIFF, MID_CHNG, MID_SIG = self.calculate_mid_average(recent_data[:self.mid_range], company_details)
+        mid_details = [MID_SIG, MID_AVG, MID_DIFF, MID_CHNG]
         if MID_SIG == 1:
             self.db_obj.add_to_mid_buy(tab_name)
         elif MID_SIG == 3:
             self.db_obj.add_to_mid_sell(tab_name)
         #--------------------------------------------------------------------------------------------------------------
-        LONG_AVG, LONG_CHNG, LONG_SIG = self.calculate_long_average(recent_data[:self.long_range], company_details)
-        long_details = [LONG_SIG, LONG_AVG, LONG_CHNG]
+        LONG_AVG, LONG_DIFF, LONG_CHNG, LONG_SIG = self.calculate_long_average(recent_data[:self.long_range], company_details)
+        long_details = [LONG_SIG, LONG_AVG, LONG_DIFF, LONG_CHNG]
         if LONG_SIG == 1:
             self.db_obj.add_to_long_buy(tab_name)
         elif LONG_SIG == 3:
@@ -194,6 +197,7 @@ class Mathematics():
         total_val = 0
         short_term_average = 0
         short_signal = None
+        short_diff = 0
         if len(short_list_dict) == self.short_range:
             for row in short_list_dict:
                 if row:
@@ -226,15 +230,17 @@ class Mathematics():
                         short_signal = 4
                     else:
                         short_signal = 3
-                return short_term_average, change, short_signal
+                short_diff = short_term_average - short_list_dict[0]['SHRT_AVG']
+                return short_term_average, abs(short_diff), change, short_signal
 
-        return short_term_average, 0, None
+        return short_term_average, 0, 0, None
 #-----------------------------------------------------------------------------------------------------------------------
 
     def calculate_mid_average(self, mid_list_dict, company_details):
         total_val = 0
         mid_term_average = 0
         mid_signal = None
+        mid_diff = 0
         if len(mid_list_dict) == self.mid_range:
             for row in mid_list_dict:
                 if row:
@@ -268,15 +274,18 @@ class Mathematics():
                         mid_signal = 4
                     else:
                         mid_signal = 3
-                return mid_term_average, change, mid_signal
+                mid_diff = mid_term_average - mid_list_dict[0]['MID_AVG']
+                return mid_term_average, abs(mid_diff), change, mid_signal
 
-        return mid_term_average, 0, None
+        return mid_term_average, 0, 0, None
 #-----------------------------------------------------------------------------------------------------------------------
 
     def calculate_long_average(self, long_list_dict, company_details):
         total_val = 0
         long_term_average = 0
         long_signal = None
+        long_diff = 0
+
         if len(long_list_dict) == self.long_range:
             for row in long_list_dict:
                 if row:
@@ -310,9 +319,10 @@ class Mathematics():
                         long_signal = 4
                     else:
                         long_signal = 3
-                return long_term_average, change, long_signal
+                long_diff = long_term_average - long_list_dict[0]['LONG_AVG']
+                return long_term_average, abs(long_diff), change, long_signal
 
-        return long_term_average, 0, None
+        return long_term_average, 0, 0, None
 #-----------------------------------------------------------------------------------------------------------------------
 
     def calculate_ex_long_average(self, ex_long_list_dict, company_details):
@@ -445,17 +455,16 @@ class Mathematics():
 
     def calculate_velox(self, details, futuro, ex_short_details, short_details,mid_details, long_details, pivot_details, macd_details, stochastic_details):
         if len(details) >= 1:
-            if short_details[0] in [4]:
-                if short_details[2] >= details[0]['SHRT_CHNG'] + Decimal(str(0.3)).quantize(TWO_PLACES):
-                    if 1.2 >= short_details[2] >= -1.2:
-                        if pivot_details[0] >= ex_short_details[1]:
-                            return 1
-            if short_details[0] in [2]:
-                if short_details[2] <= details[0]['SHRT_CHNG'] - Decimal(str(0.3)).quantize(TWO_PLACES):
-                    if 1.2 >= short_details[2] >= -1.2:
-                        if pivot_details[0] <= ex_short_details[1]:
-                            return 3
-            return None
+            if short_details[0] == 4:
+                if mid_details[2] <= details[0]['MID_DIFF']:
+                    if pivot_details[0] > details[0]['PIVOT_VALUE']:
+                        return 1
+            elif short_details[0] == 2:
+                if mid_details[2] <= details[0]['MID_DIFF']:
+                    if pivot_details[0] < details[0]['PIVOT_VALUE']:
+                        return 3
+            else:
+                return None
         return None
 
     def calculate_velox_old(self, details, futuro, ex_short_details, short_details,mid_details, long_details, pivot_details, momentum_details, stochastic_details ):
@@ -525,17 +534,16 @@ class Mathematics():
 
     def calculate_futuro(self, details, pivot_details, momentum_details, ex_short_details, short_details,mid_details, long_details, stochastic_details):
         if len(details) >= 1:
-            if ex_short_details[0] in [4]:
-                if ex_short_details[2] >= details[0]['EX_SHRT_CHNG'] + Decimal(str(0.5)).quantize(TWO_PLACES):
-                    if 1.5 >= ex_short_details[2] >= -1.5:
-                        if pivot_details[0] >= ex_short_details[1]:
-                            return 1
-            if ex_short_details[0] in [2]:
-                if ex_short_details[2] <= details[0]['EX_SHRT_CHNG'] - Decimal(str(0.5)).quantize(TWO_PLACES):
-                    if 1.5 >= ex_short_details[2] >= -1.5:
-                        if pivot_details[0] <= ex_short_details[1]:
-                            return 3
-            return None
+            if short_details[0] == 4:
+                if short_details[2] <= details[0]['SHRT_DIFF']:
+                    if pivot_details[0] > details[0]['PIVOT_VALUE']:
+                        return 1
+            elif short_details[0] == 2:
+                if short_details[2] <= details[0]['SHRT_DIFF']:
+                    if pivot_details[0] < details[0]['PIVOT_VALUE']:
+                        return 3
+            else:
+                return None
         return None
 
     def calculate_futuro_old(self, details, pivot_details, momentum_details, ex_short_details, short_details,mid_details, long_details, stochastic_details):

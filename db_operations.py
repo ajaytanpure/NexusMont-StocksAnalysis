@@ -19,10 +19,14 @@ class DBOps():
         logging.debug("Read the database configuration from configuration file")
         server = database_option['server']
         database = database_option['database']
-        user = database_option['user']
-        password = database_option['password']
+        #user = database_option['user']
+        #password = database_option['password']
         logging.debug("Connecting to database")
-        self._db_connection = pyodbc.connect(driver='{SQL Server}', server=server, database=database, uid=user, pwd=password)
+        try:
+            self._db_connection = pyodbc.connect(driver='{SQL Server}', server=server, database=database)
+        except Exception:
+            print 'No I am not connected to database'
+            traceback.print_exc()
         logging.debug("Connected to database")
         self._db_cur = self._db_connection.cursor()
 

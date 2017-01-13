@@ -43,13 +43,14 @@ class ChartPage(chart_ui.Ui_Dialog):
         if not selected_company:
             return
         self.all_data = self.db_obj.get_company_data(selected_company)
+        print self.all_data
         self.render_graph()
         self.company_val.setText(selected_company)
         self.company_val.setStyleSheet('color: blue')
         self.table_data.setRowCount(len(self.all_data))
         self.table_data.setColumnCount(len(self.all_data[0]))
         self.table_data.verticalScrollBar().setValue(self.table_data.verticalScrollBar().maximum())
-        self.table_data.setHorizontalHeaderLabels(['DATE',' OPEN    ',u' HIGH    ',u' LOW     ',u' CLOSE   ','SHRT_SIG','SHRT_AVG','SHRT %','MID_SIG','MID_AVG','MID %',
+        self.table_data.setHorizontalHeaderLabels(['DATE',' OPEN    ',u' HIGH    ',u' LOW     ',u' CLOSE   ','SHRT_SIG','SHRT_AVG','SHRT_DIFF','MID_SIG','MID_AVG','MID_DIFF',
                                                    'LONG_SIG','LONG_AVG','LONG %','CERTUS','VELOX','FUTURO','PIVOT','PIVOT %','STOCH','MACD','MACD %','MACD_D %',
                                                    'EX_SHRT_SIG','EX_SHRT_AVG','EX_SHRT %','QUANTITY','TRADERS','EX_LONG_SIG','EX_LONG_AVG','MNTM','MNTM %'])
 

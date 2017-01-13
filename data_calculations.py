@@ -30,7 +30,7 @@ class DataCalc():
         self.data_db_obj.truncate_all_signals()
 
     def update_cnx_list(self):
-        cnx_file_list = ['ind_niftylist.csv', 'ind_cnx200list.csv']
+        cnx_file_list = ['ind_niftylist.csv', 'ind_nifty200list.csv']
         cnx_file_obj = None
         for file_name in cnx_file_list:
             try:
